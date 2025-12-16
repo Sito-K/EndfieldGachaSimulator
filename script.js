@@ -96,10 +96,7 @@ bannerButtons.forEach(btn=>{
 
 clearAllBtn.addEventListener('click', ()=>{
   localStorage.removeItem('totalPullCounter');
-
   totalPullCounter = 0;
-
-  resultsEl.innerHTML = '';
   renderLeaderboard();
   updatePullDisplay();
 });
