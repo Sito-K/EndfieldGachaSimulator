@@ -190,7 +190,7 @@ select,input[type="range"],input[type="number"]{
 
 .card.r6 {
   animation-name: cardReveal, sixStarReveal;
-  animation-duration: 0.25s;
+  animation-duration: 0.25s, 0.25s;
   animation-timing-function: ease-out, ease-out;
   animation-fill-mode: both, both;
   border: 2px solid #F25D07;
