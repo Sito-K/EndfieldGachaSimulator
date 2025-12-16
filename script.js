@@ -49,7 +49,7 @@ const baseRate5 = 0.08;
 const defaultPityLimit = 80;
 let pityCounter = 0;
 let pity5Counter = 0;
-let totalPullCounter = 0;
+let totalPullCounter = Number(localStorage.getItem('totalPullCounter') || 0);
 const pityStart = 65;
 const pityIncrement = 0.05;
 
@@ -68,6 +68,7 @@ const currentRate6El = document.getElementById('currentRate6');
 const totalPullCountEl = document.getElementById('totalPullCount');
 const bannerButtons = document.querySelectorAll('.banner-btn');
 let currentBanner = "standard";
+const clearAllBtn = document.getElementById('clearAll');
 
 // ==============================
 // 이벤트
@@ -92,6 +93,17 @@ bannerButtons.forEach(btn=>{
     updatePullDisplay();
   });
 });
+
+clearAllBtn.addEventListener('click', ()=>{
+  localStorage.removeItem('totalPullCounter');
+
+  totalPullCounter = 0;
+
+  resultsEl.innerHTML = '';
+  renderLeaderboard();
+  updatePullDisplay();
+});
+
 
 // ==============================
 // 표시 업데이트
@@ -119,8 +131,11 @@ function pushHistory(entry){
   const lbKey = 'gacha_lb';
   const lb = JSON.parse(localStorage.getItem(lbKey) || '[]');
   if(entry.rarity === 6){
-    lb.unshift({when: entry.when, name: entry.name});
-    localStorage.setItem(lbKey, JSON.stringify(lb.slice(0,50)));
+    lb.unshift({
+      when: entry.when,
+      name: entry.name,
+      pulls: entry.pulls
+    });
   }
   renderLeaderboard();
 }
@@ -128,8 +143,17 @@ function pushHistory(entry){
 function renderLeaderboard(){
   const lb = JSON.parse(localStorage.getItem('gacha_lb') || '[]');
   if(lb.length===0) leaderboardEl.textContent='현재 기록 없음';
-  else leaderboardEl.innerHTML = lb.slice(0,5)
-    .map((e,i)=> `<div>${i+1}. ${e.name} : ${new Date(e.when).toLocaleString()}</div>`).join('');
+  else leaderboardEl.innerHTML = lb.slice(0,20)
+    .map((e,i)=> `
+      <div>
+        ${i+1}. ${e.name}
+        <span style="color:#ffcc66">
+          (${e.pulls})
+        </span>
+        - ${new Date(e.when).toLocaleString()}
+      </div>
+    `)
+
 }
 
 // ==============================
@@ -223,8 +247,17 @@ function runPull(count=1){
     const rty = weightedRarityRoll();
     const pick = pickRandomFromPool(rty);
     outcomes.push(pick);
-    
+
     if(rty === 6){
+      const pullsToSix = pityCounter + 1;
+
+      pushHistory({
+        when: new Date().toISOString(),
+        name: pick.name,
+        rarity: pick.rarity,
+        pulls: pullsToSix
+      });
+
       pityCounter = 0;
       pity5Counter = 0;
     } else if(rty === 5){
@@ -236,7 +269,7 @@ function runPull(count=1){
     }
 
     totalPullCounter++;
-    pushHistory({when:new Date().toISOString(), name:pick.name, rarity:pick.rarity});
+    localStorage.setItem('totalPullCounter', totalPullCounter);
   }
   
   renderCards(outcomes,count);
