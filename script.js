@@ -216,12 +216,7 @@ function renderCards(outcomes, count){
   resultsEl.innerHTML = '';
   resultsEl.classList.remove('single','ten');
   resultsEl.classList.add('results-grid');
-  
-  if (count === 10) {
-    resultsEl.classList.add('ten');
-  } else {
-    resultsEl.classList.add('single');
-  }
+  resultsEl.classList.add(count === 10 ? 'ten' : 'single');
 
   outcomes.forEach((card, index)=>{
     const node = cardTpl.cloneNode(true);
@@ -229,16 +224,18 @@ function renderCards(outcomes, count){
 
     el.classList.add('r' + card.rarity);
 
+    const delay = card.rarity === 6
+      ? index * 0.1
+      : index * 0.08;
+
+    el.style.animationDelay = `${delay}s`;
+
     node.querySelector('.char-img').src =
       card.img || 'assets/placeholder.png';
     node.querySelector('.char-name').textContent =
       card.name;
     node.querySelector('.rarity-badge').textContent =
       card.rarity + '★';
-
-    if(card.rarity === 6){
-      el.style.animationDelay = `${index * 0.1}s`;
-    }
 
     resultsEl.appendChild(node);
   });
