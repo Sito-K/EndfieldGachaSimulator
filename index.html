@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>엔드필드 가챠 시뮬레이터</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="brand">
+      <img src="assets/icon.png" class="logo">
+      <h1>엔드필드 가챠 시뮬레이터</h1>
+    </div>
+    <div class="controls">
+      <button id="singleBtn" class="btn primary">단일 소환</button>
+      <button id="tenBtn" class="btn primary">10연 소환</button>
+    </div>
+  </div>
+
+  <main>
+
+    <div class="panel config">
+      <div class="cfg-item banner-buttons">
+        <button class="banner-btn active" data-banner="standard">일반 배너</button>
+        <button class="banner-btn" data-banner="limitedA">레바테인 픽업</button>
+        <button class="banner-btn" data-banner="limitedB">이본 픽업</button>
+        <button class="banner-btn" data-banner="limitedC">질베르타 픽업</button>
+      </div>
+
+      <div class="cfg-item">
+        <label>6성 확률:</label>
+        <span id="currentRate6">0.80%</span>
+      </div>
+      <div class="cfg-item">
+        <label>전체 뽑기 횟수:</label>
+        <span id="totalPullCount">0</span>
+      </div>
+      <div class="cfg-item">
+        <label>현재 뽑기 횟수:</label>
+        <span id="currentPullCount">0</span>
+      </div>
+      <div class="cfg-item">
+        <label>천장까지 남은 횟수:</label>
+        <span id="pityRemaining">80</span>
+      </div>
+    </div>
+
+    <div class="panel results-area">
+      <div id="results" class="results-grid"></div>
+    </div>
+
+    <div class="panel leaderboard">
+      <h3>6성 획득 기록</h3>
+      <div id="leaderboard"></div>
+      <button id="clearLB" class="btn small">기록 초기화</button>
+    </div>
+
+  </main>
+
+</div>
+
+<!-- 카드 템플릿 -->
+<template id="cardTpl">
+  <div class="card">
+    <div class="card-inner">
+      <div class="card-face front">
+        <img class="char-img">
+        <div class="char-name"></div>
+        <div class="rarity-badge"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script src="script.js"></script>
+</body>
+</html>

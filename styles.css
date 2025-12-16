@@ -1,0 +1,157 @@
+:root{
+  --bg: #071223;
+  --panel: #0b1724;
+  --text: #e6eef8;
+  --accent: #2ea6ff;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,Arial;
+  background:linear-gradient(180deg,#06101b,#071923);
+  color:var(--text);
+  padding:16px;
+}
+
+.app{max-width:1100px;margin:0 auto}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:40px;height:40px;border-radius:6px;object-fit:cover}
+h1{font-size:1.2rem;margin:0}
+
+.controls{display:flex;gap:8px;align-items:center}
+
+.btn{
+  background:#14233a;border:0;padding:8px 12px;
+  border-radius:8px;color:var(--text);cursor:pointer
+}
+.btn.primary{background:linear-gradient(90deg,#1e6cff,#2ea6ff)}
+.btn.small{padding:6px 8px;font-size:.85rem}
+
+select,input[type="range"],input[type="number"]{
+  background:transparent;color:var(--text);
+  border:1px solid rgba(255,255,255,.06);
+  padding:6px;border-radius:6px;
+}
+
+.panel{
+  background:var(--panel);
+  padding:12px;border-radius:10px;
+  display:flex;flex-direction:column;gap:12px;
+}
+
+.cfg-item{display:flex;align-items:center;gap:8px}
+
+.results-grid{
+  display:grid;
+  gap:12px;
+  justify-content:center;
+  grid-template-columns:repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.results-grid.single {
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.results-grid.single .card {
+  padding-bottom:120%;
+  min-height: 180px;
+}
+
+.results-grid.ten {
+  grid-template-columns: repeat(5, 1fr);
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.results-grid.ten .card {
+  padding-bottom: 120%;
+  min-height: 180px;
+}
+
+@media (max-width: 600px) {
+  .results-grid.ten {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 100%;
+  }
+
+  .results-grid.ten .card {
+    padding-bottom: 133%;
+  }
+}
+
+.card {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  position: relative;
+}
+
+.card-face{
+  position:absolute;inset:0;border-radius:10px;
+  overflow:hidden;display:flex;
+  flex-direction:column;align-items:center;
+  justify-content:center;backface-visibility:hidden;
+}
+
+.front{background:rgba(255,255,255,0.03)}
+
+.char-img{
+  width:100%;height:calc(100% - 36px);
+  object-fit:cover;
+}
+
+.char-name{margin-top:8px;font-weight:600;text-align:center;font-size:.92rem}
+
+.rarity-badge{
+  position:absolute;left:6px;top:6px;
+  padding:4px;border-radius:6px;font-weight:700
+}
+
+.r6 .rarity-badge{
+  background:linear-gradient(135deg,#F25D07,#F25D07);color:#000000
+}
+.r5 .rarity-badge{
+  background:linear-gradient(135deg,#FFB90E,#FFB90E);color:#000000
+}
+.r4 .rarity-badge{
+  background:linear-gradient(135deg,#8350F2,#8350F2);color:#000000
+}
+
+.log{font-size:.9rem;color:#cfe6ff;max-height:160px;overflow:auto}
+.sim-output{white-space:pre-wrap;background:rgba(255,255,255,0.02);padding:8px;border-radius:6px}
+
+@media(max-width:750px){
+  .topbar{flex-direction:column;gap:10px}
+  .controls{width:100%;justify-content:center}
+}
+
+.banner-buttons {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.banner-btn {
+  background:#14233a;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  color: #4ea3ff;
+  border:1px solid rgba(255,255,255,0.08);
+  font-size:0.85rem;
+}
+
+.banner-btn.active {
+    border: 3px solid #4ea3ff;
+    box-shadow: 0 0 12px #4ea3ff;
+    border-radius: 8px;
+}
