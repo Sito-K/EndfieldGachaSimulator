@@ -136,6 +136,7 @@ function pushHistory(entry){
       name: entry.name,
       pulls: entry.pulls
     });
+    localStorage.setItem(lbKey, JSON.stringify(lb.slice(0,50)));
   }
   renderLeaderboard();
 }
@@ -144,16 +145,14 @@ function renderLeaderboard(){
   const lb = JSON.parse(localStorage.getItem('gacha_lb') || '[]');
   if(lb.length===0) leaderboardEl.textContent='현재 기록 없음';
   else leaderboardEl.innerHTML = lb.slice(0,20)
-    .map((e,i)=> `
-      <div>
-        ${i+1}. ${e.name}
-        <span style="color:#ffcc66">
-          (${e.pulls})
-        </span>
-        - ${new Date(e.when).toLocaleString()}
-      </div>
-    `)
-
+  .map((e,i)=> `
+    <div>
+      ${i+1}. ${e.name}
+      <span style="color:#ffcc66">(${e.pulls}뽑)</span>
+      - ${new Date(e.when).toLocaleString()}
+    </div>
+  `)
+  .join('');
 }
 
 // ==============================
