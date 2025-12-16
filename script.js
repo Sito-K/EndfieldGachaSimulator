@@ -212,8 +212,8 @@ function weightedRarityRoll(){
 // ==============================
 // 카드 렌더링
 // ==============================
-function renderCards(outcomes,count){
-  resultsEl.innerHTML='';
+function renderCards(outcomes, count){
+  resultsEl.innerHTML = '';
   resultsEl.classList.remove('single','ten');
   resultsEl.classList.add('results-grid');
   
@@ -222,14 +222,19 @@ function renderCards(outcomes,count){
   } else {
     resultsEl.classList.add('single');
   }
-  
-  outcomes.forEach(card, index)=>{
+
+  outcomes.forEach((card, index)=>{
     const node = cardTpl.cloneNode(true);
     const el = node.querySelector('.card');
-    el.classList.add('r'+card.rarity);
-    node.querySelector('.char-img').src=card.img||'assets/placeholder.png';
-    node.querySelector('.char-name').textContent=card.name;
-    node.querySelector('.rarity-badge').textContent=card.rarity+'★';
+
+    el.classList.add('r' + card.rarity);
+
+    node.querySelector('.char-img').src =
+      card.img || 'assets/placeholder.png';
+    node.querySelector('.char-name').textContent =
+      card.name;
+    node.querySelector('.rarity-badge').textContent =
+      card.rarity + '★';
 
     if(card.rarity === 6){
       el.style.animationDelay = `${index * 0.1}s`;
