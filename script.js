@@ -224,7 +224,7 @@ function renderCards(outcomes, count){
 
     el.classList.add('r' + card.rarity);
 
-    const delay = index * 0.05;
+    const delay = index * 0.07;
 
     el.style.animationDelay = `${delay}s`;
 
