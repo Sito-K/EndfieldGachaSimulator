@@ -222,10 +222,8 @@ function renderCards(outcomes,count){
   } else {
     resultsEl.classList.add('single');
   }
-
-  let hasSixStar = false;
   
-  outcomes.forEach(card=>{
+  outcomes.forEach(card, index)=>{
     const node = cardTpl.cloneNode(true);
     const el = node.querySelector('.card');
     el.classList.add('r'+card.rarity);
@@ -234,7 +232,6 @@ function renderCards(outcomes,count){
     node.querySelector('.rarity-badge').textContent=card.rarity+'★';
 
     if(card.rarity === 6){
-      hasSixStar = true;
       el.style.animationDelay = `${index * 0.1}s`;
     }
 
