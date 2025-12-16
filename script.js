@@ -41,6 +41,22 @@ const pool = {
   }
 };
 
+const cachedPools = (() => {
+  const result = {
+    standard: {4:[],5:[],6:[]},
+    banners: {}
+  };
+
+  pool.standard.forEach(c => result.standard[c.rarity].push(c));
+
+  Object.entries(pool.banners).forEach(([key,list])=>{
+    result.banners[key] = {6:[]};
+    list.forEach(c => result.banners[key][6].push(c));
+  });
+
+  return result;
+})();
+
 // ==============================
 // 확률 / 천장
 // ==============================
@@ -105,15 +121,11 @@ clearAllBtn.addEventListener('click', ()=>{
 // ==============================
 // 표시 업데이트
 // ==============================
-function updatePullDisplay() {
+function updatePullDisplay(){
   currentPullCountEl.textContent = pityCounter;
   pityRemainingEl.textContent = Math.max(0, defaultPityLimit - pityCounter);
   totalPullCountEl.textContent = totalPullCounter;
-
-  let currentRate = baseRate6;
-  if(pityCounter >= pityStart) currentRate += pityIncrement * (pityCounter - pityStart + 1);
-  if(currentRate > 1) currentRate = 1;
-  currentRate6El.textContent = (currentRate*100).toFixed(2) + '%';
+  currentRate6El.textContent = (getCurrent6Rate() * 100).toFixed(2) + '%';
 }
 
 // ==============================
@@ -156,56 +168,43 @@ function renderLeaderboard(){
 // 캐릭터 선택
 // ==============================
 function pickRandomFromPool(rarity){
-  const standardPool = pool.standard.filter(x => x.rarity === rarity);
-  const bannerPool = (pool.banners[currentBanner] || [])
-    .filter(x => x.rarity === rarity);
+  const standard = cachedPools.standard[rarity] || [];
+  const banner = cachedPools.banners[currentBanner]?.[rarity] || [];
 
-  if (rarity === 6 && bannerPool.length > 0) {
-
-    const pickup = bannerPool.filter(x => x.isPickup);
-    const nonPickup = [
-      ...standardPool,
-      ...bannerPool.filter(x => !x.isPickup)
-    ];
-
-    if (pickup.length > 0 && Math.random() < 0.5) {
+  // 6성 + 배너
+  if (rarity === 6 && banner.length) {
+    const pickup = banner.filter(c => c.isPickup);
+    if (pickup.length && Math.random() < 0.5) {
       return pickup[Math.floor(Math.random() * pickup.length)];
     }
-
-    return nonPickup[Math.floor(Math.random() * nonPickup.length)];
+    const merged = standard.concat(banner.filter(c => !c.isPickup));
+    return merged[Math.floor(Math.random() * merged.length)];
   }
 
-  const all = [...standardPool, ...bannerPool];
-  return all[Math.floor(Math.random() * all.length)];
+  const merged = standard.concat(banner);
+  return merged[Math.floor(Math.random() * merged.length)];
 }
 
 // ==============================
 // 확률 로직 (5성 천장 포함)
 // ==============================
+function getCurrent6Rate(){
+  if (pityCounter < pityStart) return baseRate6;
+  return Math.min(
+    1,
+    baseRate6 + pityIncrement * (pityCounter - pityStart + 1)
+  );
+}
+
 function weightedRarityRoll(){
-  let rate6 = baseRate6;
-  let rate5 = baseRate5;
-
-  if(pityCounter >= pityStart) {
-    rate6 += pityIncrement * (pityCounter - pityStart + 1);
-  }
-  if(rate6 > 1) rate6 = 1;
-
-  if(pity5Counter >= 9) {
-    return 5;
-  }
-
-  if(pityCounter >= defaultPityLimit - 1) {
-    return 6;
-  }
+  if (pityCounter >= defaultPityLimit - 1) return 6;
+  if (pity5Counter >= 9) return 5;
 
   const r = Math.random();
-  let acc = rate6;
-  if(r < acc) return 6;
+  const rate6 = getCurrent6Rate();
 
-  acc += rate5;
-  if(r < acc) return 5;
-
+  if (r < rate6) return 6;
+  if (r < rate6 + baseRate5) return 5;
   return 4;
 }
 
@@ -214,66 +213,56 @@ function weightedRarityRoll(){
 // ==============================
 function renderCards(outcomes, count){
   resultsEl.innerHTML = '';
-  resultsEl.classList.remove('single','ten');
-  resultsEl.classList.add('results-grid');
-  resultsEl.classList.add(count === 10 ? 'ten' : 'single');
+  resultsEl.className = `results-grid ${count === 10 ? 'ten' : 'single'}`;
+
+  const frag = document.createDocumentFragment();
 
   outcomes.forEach((card, index)=>{
     const node = cardTpl.cloneNode(true);
     const el = node.querySelector('.card');
 
-    el.classList.add('r' + card.rarity);
+    el.classList.add(`r${card.rarity}`);
+    el.style.animationDelay = `${index * 0.08}s`;
 
-    const delay = index * 0.07;
+    node.querySelector('.char-img').src = card.img;
+    node.querySelector('.char-name').textContent = card.name;
+    node.querySelector('.rarity-badge').textContent = `${card.rarity}★`;
 
-    el.style.animationDelay = `${delay}s`;
-
-    node.querySelector('.char-img').src =
-      card.img || 'assets/placeholder.png';
-    node.querySelector('.char-name').textContent =
-      card.name;
-    node.querySelector('.rarity-badge').textContent =
-      card.rarity + '★';
-
-    resultsEl.appendChild(node);
+    frag.appendChild(node);
   });
+
+  resultsEl.appendChild(frag);
 }
 
 // ==============================
 // 뽑기 실행
 // ==============================
-function runPull(count=1){
-  const outcomes = [];
-  for(let i=0;i<count;i++){
-    const rty = weightedRarityRoll();
-    const pick = pickRandomFromPool(rty);
-    outcomes.push(pick);
+function pullOnce(){
+  const rarity = weightedRarityRoll();
+  const pick = pickRandomFromPool(rarity);
 
-    if(rty === 6){
-      const pullsToSix = pityCounter + 1;
-
-      pushHistory({
-        when: new Date().toISOString(),
-        name: pick.name,
-        rarity: pick.rarity,
-        pulls: pullsToSix
-      });
-
-      pityCounter = 0;
-      pity5Counter = 0;
-    } else if(rty === 5){
-      pity5Counter = 0;
-      pityCounter++;
-    } else {
-      pityCounter++;
-      pity5Counter++;
-    }
-
-    totalPullCounter++;
-    localStorage.setItem('totalPullCounter', totalPullCounter);
+  if (rarity === 6) {
+    pushHistory({
+      when: new Date().toISOString(),
+      name: pick.name,
+      rarity: 6,
+      pulls: pityCounter + 1
+    });
+    pityCounter = 0;
+    pity5Counter = 0;
+  } else {
+    pityCounter++;
+    pity5Counter = rarity === 5 ? 0 : pity5Counter + 1;
   }
-  
-  renderCards(outcomes,count);
+
+  totalPullCounter++;
+  return pick;
+}
+
+function runPull(count=1){
+  const outcomes = Array.from({length:count}, pullOnce);
+  localStorage.setItem('totalPullCounter', totalPullCounter);
+  renderCards(outcomes, count);
   updatePullDisplay();
 }
 
