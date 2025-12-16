@@ -1,0 +1,2 @@
+# EndfieldGachaSimulator
+EndfieldGachaSimulator
