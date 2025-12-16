@@ -222,6 +222,8 @@ function renderCards(outcomes,count){
   } else {
     resultsEl.classList.add('single');
   }
+
+  let hasSixStar = false;
   
   outcomes.forEach(card=>{
     const node = cardTpl.cloneNode(true);
@@ -230,6 +232,12 @@ function renderCards(outcomes,count){
     node.querySelector('.char-img').src=card.img||'assets/placeholder.png';
     node.querySelector('.char-name').textContent=card.name;
     node.querySelector('.rarity-badge').textContent=card.rarity+'★';
+
+    if(card.rarity === 6){
+      hasSixStar = true;
+      el.style.animationDelay = `${index * 0.1}s`;
+    }
+
     resultsEl.appendChild(node);
   });
 }
